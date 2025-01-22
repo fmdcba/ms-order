@@ -1,13 +1,12 @@
 package com.mindhub.ms_order.dtos;
 
-import com.mindhub.ms_order.models.Order;
 import com.mindhub.ms_order.models.OrderItem;
 
 public class OrderItemDTO {
 
     private Long id;
 
-    private Order orderId;
+    private Long orderId;
 
     private Long productId;
 
@@ -27,7 +26,7 @@ public class OrderItemDTO {
         return id;
     }
 
-    public Order getOrderId() {
+    public Long getOrderId() {
         return orderId;
     }
 
