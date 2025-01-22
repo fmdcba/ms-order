@@ -2,10 +2,11 @@ package com.mindhub.ms_order.models;
 
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-public class Order {
+public class OrderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,14 +15,16 @@ public class Order {
     private Long userId;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> products;
+    private Set<OrderItem> products = new HashSet<>();
 
     private OrderStatus status;
 
-    public Order(Long userId, List<OrderItem> products, OrderStatus status) {
+    public OrderEntity(Long userId, OrderStatus status) {
         this.userId = userId;
-        this.products = products;
         this.status = status;
+    }
+
+    public OrderEntity() {
     }
 
     public Long getId() {
@@ -36,11 +39,11 @@ public class Order {
         this.userId = userId;
     }
 
-    public List<OrderItem> getProducts() {
+    public Set<OrderItem> getProducts() {
         return products;
     }
 
-    public void setProducts(List<OrderItem> products) {
+    public void setProducts(Set<OrderItem> products) {
         this.products = products;
     }
 

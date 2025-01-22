@@ -1,29 +1,28 @@
 package com.mindhub.ms_order.dtos;
 
-import com.mindhub.ms_order.models.Order;
-import com.mindhub.ms_order.models.OrderItem;
+import com.mindhub.ms_order.models.OrderEntity;
 import com.mindhub.ms_order.models.OrderStatus;
 
 import java.util.List;
 
-public class OrderDTO {
+public class OrderEntityDTO {
 
     private Long id;
 
     private Long userId;
 
-    private List<OrderItem> products;
+    private List<OrderItemDTO> products;
 
     private OrderStatus status;
 
-    public OrderDTO(Order order) {
+    public OrderEntityDTO(OrderEntity order) {
         id = order.getId();
         userId = order.getUserId();
-        products = order.getProducts();
+        products = order.getProducts().stream().map(product -> new OrderItemDTO(product)).toList();
         status = order.getStatus();
     }
 
-    public OrderDTO() {
+    public OrderEntityDTO() {
     }
 
     public Long getId() {
@@ -34,7 +33,7 @@ public class OrderDTO {
         return userId;
     }
 
-    public List<OrderItem> getProducts() {
+    public List<OrderItemDTO> getProducts() {
         return products;
     }
 
