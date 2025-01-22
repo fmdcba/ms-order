@@ -10,14 +10,14 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne
-    private Order orderId;
+    private OrderEntity orderId;
 
     private Long productId;
 
     private Integer quantity;
 
-    public OrderItem(Order orderId, Long productId, Integer quantity) {
-        this.orderId = orderId;
+    public OrderItem(OrderEntity order, Long productId, Integer quantity) {
+        this.orderId = order;
         this.productId = productId;
         this.quantity = quantity;
     }
@@ -29,12 +29,12 @@ public class OrderItem {
         return id;
     }
 
-    public Order getOrderId() {
-        return orderId;
+    public Long getOrderId() {
+        return orderId.getId();
     }
 
-    public void setOrderId(Order orderId) {
-        this.orderId = orderId;
+    public void setOrderId(OrderEntity order) {
+        this.orderId = order;
     }
 
     public Long getProductId() {
