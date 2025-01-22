@@ -14,7 +14,7 @@ public class OrderEntity {
 
     private Long userId;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "orderId", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderItem> products = new HashSet<>();
 
     private OrderStatus status;
