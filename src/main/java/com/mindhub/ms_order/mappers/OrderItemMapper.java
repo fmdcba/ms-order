@@ -1,6 +1,7 @@
 package com.mindhub.ms_order.mappers;
 
 import com.mindhub.ms_order.dtos.OrderItemDTO;
+import com.mindhub.ms_order.models.OrderEntity;
 import com.mindhub.ms_order.models.OrderItem;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +18,11 @@ public class OrderItemMapper {
         return orderItems.stream().map(orderItem -> new OrderItemDTO(orderItem)).toList();
     }
 
-    public OrderItem orderItemToEntity (OrderItemDTO orderItem){
-        return new OrderItem (orderItem.getOrderId(), orderItem.getProductId(), orderItem.getQuantity());
+    public OrderItem orderItemToEntity (OrderEntity order, OrderItemDTO orderItem){
+        return new OrderItem (order, orderItem.getProductId(), orderItem.getQuantity());
     }
 
     public OrderItem updateOrderItemToEntity (OrderItem orderItemToUpdate, OrderItemDTO updatedOrderItem) {
-        orderItemToUpdate.setOrderId(updatedOrderItem.getOrderId());
         orderItemToUpdate.setProductId(updatedOrderItem.getProductId());
         orderItemToUpdate.setQuantity(updatedOrderItem.getQuantity());
 
