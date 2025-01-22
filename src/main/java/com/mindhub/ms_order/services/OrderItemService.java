@@ -11,7 +11,7 @@ public interface OrderItemService extends GenericService<OrderItem> {
 
     List<OrderItemDTO> getAllOrderItems();
 
-    OrderItem createOrderItem(OrderItemDTO newOrderItem);
+    OrderItem createOrderItem(OrderItemDTO newOrderItem) throws Exception;
 
     OrderItem updateOrderItem(Long id, OrderItemDTO updatedOrderItem) throws Exception;
 

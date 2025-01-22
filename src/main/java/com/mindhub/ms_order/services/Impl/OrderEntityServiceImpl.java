@@ -25,6 +25,11 @@ public class OrderEntityServiceImpl implements OrderEntityService {
     }
 
     @Override
+    public OrderEntity getOrderEntity(Long id) throws Exception {
+        return findById(id);
+    }
+
+    @Override
     public List<OrderEntityDTO> getAllOrders() {
         return  orderEntityMapper.orderListToDTO(orderEntityRepository.findAll());
     }

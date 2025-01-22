@@ -9,6 +9,8 @@ public interface OrderEntityService extends GenericService<OrderEntity> {
 
     OrderEntityDTO getOrder(Long id) throws Exception;
 
+    OrderEntity getOrderEntity(Long id) throws Exception;
+
     List<OrderEntityDTO> getAllOrders();
 
     OrderEntity createOrder(OrderEntityDTO newOrderEntity);
