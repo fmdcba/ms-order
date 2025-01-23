@@ -2,7 +2,7 @@ package com.mindhub.ms_order.controllers;
 
 import com.mindhub.ms_order.dtos.OrderItemDTO;
 import com.mindhub.ms_order.exceptions.NotFoundException;
-import com.mindhub.ms_order.exceptions.NotValidArgument;
+import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import com.mindhub.ms_order.models.OrderItem;
 import com.mindhub.ms_order.services.OrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class OrderItemController {
     ControllerValidations controllerValidations;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOrderItem(@PathVariable long id) throws NotFoundException, NotValidArgument {
+    public ResponseEntity<?> getOrderItem(@PathVariable long id) throws NotFoundException, NotValidArgumentException {
         controllerValidations.isValidId(id);
         OrderItemDTO order = orderItemService.getOrderItem(id);
         return new ResponseEntity<>(order, HttpStatus.OK);
@@ -36,33 +36,33 @@ public class OrderItemController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createOrderItem(@RequestBody OrderItemDTO newOrderItem) throws NotFoundException, NotValidArgument {
+    public ResponseEntity<?> createOrderItem(@RequestBody OrderItemDTO newOrderItem) throws NotFoundException, NotValidArgumentException {
         validateEntries(newOrderItem);
         OrderItem newOrderItemEntity = orderItemService.createOrderItem(newOrderItem);
         return new ResponseEntity<>(newOrderItemEntity, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOrderItem(@PathVariable Long id, @RequestBody OrderItemDTO updatedOrder) throws NotFoundException, NotValidArgument {
+    public ResponseEntity<?> updateOrderItem(@PathVariable Long id, @RequestBody OrderItemDTO updatedOrder) throws NotFoundException, NotValidArgumentException {
         validateEntries(updatedOrder);
         OrderItem updatedOrderToEntity = orderItemService.updateOrderItem(id, updatedOrder);
         return new ResponseEntity<>(updatedOrderToEntity, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOrderItem(@PathVariable Long id) throws NotValidArgument {
+    public ResponseEntity<?> deleteOrderItem(@PathVariable Long id) throws NotValidArgumentException, NotFoundException {
         controllerValidations.isValidId(id);
         orderItemService.deleteOrderItem(id);
         return new ResponseEntity<>("Order deleted successfully.", HttpStatus.OK);
     }
 
-    public void isQuantityMoreThanZero (Integer quantity) throws NotValidArgument {
+    public void isQuantityMoreThanZero (Integer quantity) throws NotValidArgumentException {
         if (quantity <= 0) {
-            throw new NotValidArgument("Quantity hast to be at least 1.");
+            throw new NotValidArgumentException("Quantity hast to be at least 1.");
         }
     }
 
-    public void validateEntries(OrderItemDTO orderItem) throws NotValidArgument {
+    public void validateEntries(OrderItemDTO orderItem) throws NotValidArgumentException {
         controllerValidations.isValidId(orderItem.getOrderId());
         controllerValidations.isValidId(orderItem.getProductId());
         isQuantityMoreThanZero(orderItem.getQuantity());

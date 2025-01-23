@@ -18,5 +18,5 @@ public interface OrderEntityService extends GenericService<OrderEntity> {
 
     OrderEntity updateOrder(Long id, OrderEntityDTO updatedOrderEntity) throws NotFoundException;
 
-    void deleteOrder(Long id);
+    void deleteOrder(Long id) throws NotFoundException;
 }

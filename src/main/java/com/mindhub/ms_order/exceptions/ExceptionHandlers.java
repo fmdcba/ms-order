@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionHandlers {
 
-    @ExceptionHandler(NotValidArgument.class)
-    public ResponseEntity<String> handleNotValidArgumentException(NotValidArgument notValidArgument) {
-        return new ResponseEntity<>(notValidArgument.getMessage(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(NotValidArgumentException.class)
+    public ResponseEntity<String> handleNotValidArgumentException(NotValidArgumentException notValidArgumentException) {
+        return new ResponseEntity<>(notValidArgumentException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NotFoundException.class)

@@ -60,7 +60,7 @@ public class OrderEntityServiceImpl implements OrderEntityService {
     }
 
     @Override
-    public void deleteOrder(Long id) {
+    public void deleteOrder(Long id) throws NotFoundException {
         if(existsById(id)) {
             deleteById(id);
         } else {

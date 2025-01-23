@@ -56,7 +56,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    public void deleteOrderItem(Long id) {
+    public void deleteOrderItem(Long id) throws NotFoundException {
         if(existsById(id)) {
             deleteById(id);
         } else {
