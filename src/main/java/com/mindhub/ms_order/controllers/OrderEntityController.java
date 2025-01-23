@@ -58,11 +58,6 @@ public class OrderEntityController {
         return new ResponseEntity<>("Order deleted successfully.", HttpStatus.OK);
     }
 
-    public void isProductEmpty(List<OrderItemDTO> products) throws NotValidArgumentException {
-        if (!products.isEmpty()) {
-            throw new NotValidArgumentException("Products has to be empty (for now).");
-        }
-    }
 
     public void isValidStatus(OrderStatus status) throws NotValidArgumentException {
         if (status.equals(OrderStatus.COMPLETED) || status.equals(OrderStatus.PENDING)) {
@@ -73,7 +68,6 @@ public class OrderEntityController {
 
     public void validateEntries(OrderEntityDTO order) throws NotValidArgumentException {
         controllerValidations.isValidId(order.getUserId());
-        isProductEmpty(order.getProducts());
         isValidStatus(order.getStatus());
     }
 }
