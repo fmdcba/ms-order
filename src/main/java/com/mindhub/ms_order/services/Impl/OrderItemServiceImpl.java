@@ -1,6 +1,7 @@
 package com.mindhub.ms_order.services.Impl;
 
 import com.mindhub.ms_order.dtos.OrderItemDTO;
+import com.mindhub.ms_order.exceptions.NotFoundException;
 import com.mindhub.ms_order.mappers.OrderItemMapper;
 import com.mindhub.ms_order.models.OrderEntity;
 import com.mindhub.ms_order.models.OrderItem;
@@ -25,8 +26,12 @@ public class OrderItemServiceImpl implements OrderItemService {
     OrderEntityService orderEntityService;
 
     @Override
-    public OrderItemDTO getOrderItem(Long id) throws Exception {
-        return orderItemMapper.orderItemToDTO(findById(id));
+    public OrderItemDTO getOrderItem(Long id) throws NotFoundException {
+        if(existsById(id)) {
+            return orderItemMapper.orderItemToDTO(findById(id));
+        } else {
+            throw new NotFoundException("Not found.");
+        }
     }
 
     @Override
@@ -35,25 +40,33 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    public OrderItem createOrderItem(OrderItemDTO newOrderItem) throws Exception {
+    public OrderItem createOrderItem(OrderItemDTO newOrderItem) throws NotFoundException {
         OrderEntity orderEntity = orderEntityService.getOrderEntity(newOrderItem.getOrderId());
         return save(orderItemMapper.orderItemToEntity(orderEntity, newOrderItem));
     }
 
     @Override
-    public OrderItem updateOrderItem(Long id, OrderItemDTO updatedOrderItem) throws Exception {
-        OrderItem orderItemToUpdate = findById(id);
-        return save(orderItemMapper.updateOrderItemToEntity(orderItemToUpdate, updatedOrderItem));
+    public OrderItem updateOrderItem(Long id, OrderItemDTO updatedOrderItem) throws NotFoundException {
+        if(existsById(id)) {
+            OrderItem orderItemToUpdate = findById(id);
+            return save(orderItemMapper.updateOrderItemToEntity(orderItemToUpdate, updatedOrderItem));
+        } else {
+            throw new NotFoundException("Not found.");
+        }
     }
 
     @Override
     public void deleteOrderItem(Long id) {
-        deleteById(id);
+        if(existsById(id)) {
+            deleteById(id);
+        } else {
+            throw new NotFoundException("Not found.");
+        }
     }
 
     @Override
-    public OrderItem findById(Long id) throws Exception {
-        return (orderItemRepository.findById(id).orElseThrow(() -> new Exception("Not Found.")));
+    public OrderItem findById(Long id) throws NotFoundException {
+        return (orderItemRepository.findById(id).orElseThrow(() -> new NotFoundException("Not found.")));
     }
 
     @Override
@@ -62,12 +75,18 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteById(Long id) {
         orderItemRepository.deleteById(id);
     }
 
     @Override
     public OrderItem save(OrderItem orderItem) {
         return orderItemRepository.save(orderItem);
+    }
+
+
+    @Override
+    public Boolean existsById(Long id) {
+        return orderItemRepository.existsById(id);
     }
 }

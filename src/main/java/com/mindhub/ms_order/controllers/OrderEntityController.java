@@ -2,6 +2,7 @@ package com.mindhub.ms_order.controllers;
 
 import com.mindhub.ms_order.dtos.OrderEntityDTO;
 import com.mindhub.ms_order.dtos.OrderItemDTO;
+import com.mindhub.ms_order.exceptions.NotFoundException;
 import com.mindhub.ms_order.exceptions.NotValidArgument;
 import com.mindhub.ms_order.models.OrderEntity;
 import com.mindhub.ms_order.models.OrderStatus;
@@ -24,7 +25,7 @@ public class OrderEntityController {
     private ControllerValidations controllerValidations;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOrder(@PathVariable long id) throws Exception {
+    public ResponseEntity<?> getOrder(@PathVariable long id) throws NotFoundException, NotValidArgument {
         controllerValidations.isValidId(id);
         OrderEntityDTO order = orderEntityService.getOrder(id);
         return new ResponseEntity<>(order, HttpStatus.OK);
@@ -44,7 +45,7 @@ public class OrderEntityController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOrder(@PathVariable Long id, @RequestBody OrderEntityDTO updatedOrder) throws Exception {
+    public ResponseEntity<?> updateOrder(@PathVariable Long id, @RequestBody OrderEntityDTO updatedOrder) throws NotFoundException, NotValidArgument {
         validateEntries(updatedOrder);
         OrderEntity updatedOrderToEntity = orderEntityService.updateOrder(id, updatedOrder);
         return new ResponseEntity<>(updatedOrderToEntity, HttpStatus.OK);

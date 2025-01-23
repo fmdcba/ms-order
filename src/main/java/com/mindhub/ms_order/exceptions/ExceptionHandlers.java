@@ -12,4 +12,9 @@ public class ExceptionHandlers {
     public ResponseEntity<String> handleNotValidArgumentException(NotValidArgument notValidArgument) {
         return new ResponseEntity<>(notValidArgument.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundExceptionException(NotFoundException notFoundException) {
+        return new ResponseEntity<>(notFoundException.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }

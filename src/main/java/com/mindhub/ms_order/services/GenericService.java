@@ -6,6 +6,7 @@ public interface GenericService<E> {
 
     E findById(Long id) throws Exception;
     List<E> findAll();
-    void deleteById(long id);
+    void deleteById(Long id);
     E save(E entity);
+    Boolean existsById(Long id);
 }
