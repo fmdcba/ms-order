@@ -7,6 +7,8 @@ import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import com.mindhub.ms_order.models.OrderEntity;
 import com.mindhub.ms_order.models.OrderStatus;
 import com.mindhub.ms_order.services.OrderEntityService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,10 @@ public class OrderEntityController {
     private ControllerValidations controllerValidations;
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get Order by id", description = "Return order if ID is valid and exists in DB")
+        @ApiResponse(responseCode = "200", description = "Return order, and http code status OK")
+        @ApiResponse(responseCode = "400", description = "Error msg Bad request: Invalid ID")
+        @ApiResponse(responseCode = "404", description = "Error msg: Not found")
     public ResponseEntity<?> getOrder(@PathVariable long id) throws NotFoundException, NotValidArgumentException {
         controllerValidations.isValidId(id);
         OrderEntityDTO order = orderEntityService.getOrder(id);
@@ -32,12 +38,18 @@ public class OrderEntityController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all orders", description = "Return all orders in DB")
+        @ApiResponse(responseCode = "200", description = "Return list of orders, and http code status OK")
     public ResponseEntity<?> getAllOrders() {
         List<OrderEntityDTO> orders = orderEntityService.getAllOrders();
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
     @PostMapping
+    @Operation(summary = "Create order", description = "Return order if ID is valid and exists in DB")
+        @ApiResponse(responseCode = "200", description = "Return created order, and http code status OK")
+        @ApiResponse(responseCode = "400", description = "Error msg Bad request: Invalid ID")
+        @ApiResponse(responseCode = "404", description = "Error msg: Not found")
     public ResponseEntity<?> createOrder(@RequestBody OrderEntityDTO newOrder) throws NotValidArgumentException {
         validateEntries(newOrder);
         OrderEntity newOrderEntity = orderEntityService.createOrder(newOrder);
@@ -45,6 +57,10 @@ public class OrderEntityController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update order", description = "Return updated order if ID is valid and exists in DB")
+        @ApiResponse(responseCode = "200", description = "Return updated order, and http code status OK")
+        @ApiResponse(responseCode = "400", description = "Error msg Bad request: Invalid ID")
+        @ApiResponse(responseCode = "404", description = "Error msg: Not found")
     public ResponseEntity<?> updateOrder(@PathVariable Long id, @RequestBody OrderEntityDTO updatedOrder) throws NotFoundException, NotValidArgumentException {
         validateEntries(updatedOrder);
         OrderEntity updatedOrderToEntity = orderEntityService.updateOrder(id, updatedOrder);
@@ -52,6 +68,10 @@ public class OrderEntityController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete order", description = "Return msg of operation completed successfully")
+        @ApiResponse(responseCode = "200", description = "Return msg: Order deleted successfully, and http code status OK")
+        @ApiResponse(responseCode = "400", description = "Error msg Bad request: Invalid ID")
+        @ApiResponse(responseCode = "404", description = "Error msg: Not found")
     public ResponseEntity<?> deleteOrder(@PathVariable Long id) throws NotValidArgumentException, NotFoundException {
         controllerValidations.isValidId(id);
         orderEntityService.deleteOrder(id);
