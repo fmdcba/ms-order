@@ -13,6 +13,195 @@
 					"name": "Order",
 					"item": [
 						{
+							"name": "Exceptions",
+							"item": [
+								{
+									"name": "Get Non-Existent Order",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8083/api/orders/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "25"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Order With Invalid ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8083/api/orders/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "-7"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Order With Invalid User ID",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"userId\": null,\r\n    \"products\": [],\r\n    \"status\": \"PENDING\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "localhost:8083/api/orders"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Order With Non-Existent User ID",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"userId\": 86,\r\n    \"products\": [],\r\n    \"status\": \"PENDING\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "localhost:8083/api/orders"
+									},
+									"response": []
+								},
+								{
+									"name": "Update Non-Existent Order",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"username\": \"pepeAdmin\", \"email\": \"pepe@admin.com\", \"roles\": \"ADMIN\"}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8083/api/orders/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "14"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update With Null User ID",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"userId\": null,\r\n    \"status\": \"PENDING\"\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8083/api/orders/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Non-Existent Order",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "localhost:8083/api/orders/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "25"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
 							"name": "Get Order",
 							"request": {
 								"method": "GET",
@@ -54,7 +243,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "    {\r\n        \"userId\": 2,\r\n        \"products\": [],\r\n        \"status\": \"PENDING\"\r\n    }",
+									"raw": "{\r\n    \"userId\": 1,\r\n    \"products\": [],\r\n    \"status\": \"PENDING\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -72,7 +261,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"id\": 1,\r\n    \"userId\": 7,\r\n    \"status\": \"PENDING\"\r\n}\r\n",
+									"raw": "{\r\n    \"userId\": 6,\r\n    \"status\": \"PENDING\"\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -119,7 +308,7 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "3"
+											"value": "1"
 										}
 									]
 								}
@@ -131,6 +320,231 @@
 				{
 					"name": "Order Item",
 					"item": [
+						{
+							"name": "Exceptions",
+							"item": [
+								{
+									"name": "Get Non-Existent Order Item",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8083/api/order-items/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"order-items",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "25"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Order Item With Invalid ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8083/api/order-items/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"order-items",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "-7"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Order Item With No Quantity",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"orderId\": 1,\r\n    \"productId\": 1,\r\n    \"quantity\": 0\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "localhost:8083/api/order-items"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Order Item With Insufficient Stock",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"orderId\": 1,\r\n    \"productId\": 2,\r\n    \"quantity\": 200\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "localhost:8083/api/order-items"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Order Item With Invalid Order ID",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"orderId\": 12,\r\n    \"productId\": 2,\r\n    \"quantity\": 123\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "localhost:8083/api/order-items"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Order Item With Invalid Product ID",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"orderId\": 2,\r\n    \"productId\": 123,\r\n    \"quantity\": 123\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "localhost:8083/api/order-items"
+									},
+									"response": []
+								},
+								{
+									"name": "Update Non-Existent Order Item",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"orderId\": 2,\r\n    \"productId\": 2,\r\n    \"quantity\": 123\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8083/api/order-items/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"order-items",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "14"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update With Null Product ID",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"orderId\": 2,\r\n    \"productId\": null,\r\n    \"quantity\": 123\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8083/api/orders/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"orders",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Non-Existent Order Item",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "localhost:8083/api/order-items/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"order-items",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "25"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
 						{
 							"name": "Get Order Item",
 							"request": {
@@ -167,13 +581,13 @@
 							"response": []
 						},
 						{
-							"name": "Create Order Item",
+							"name": "Create Order Item (With Enough Stock)",
 							"request": {
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"orderId\": 2,\r\n    \"productId\": 3,\r\n    \"quantity\": 23\r\n}",
+									"raw": "{\r\n    \"orderId\": 1,\r\n    \"productId\": 2,\r\n    \"quantity\": 5\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
