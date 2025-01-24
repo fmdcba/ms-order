@@ -1,7 +1,6 @@
 package com.mindhub.ms_order.controllers;
 
 import com.mindhub.ms_order.dtos.OrderEntityDTO;
-import com.mindhub.ms_order.dtos.OrderItemDTO;
 import com.mindhub.ms_order.exceptions.NotFoundException;
 import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import com.mindhub.ms_order.models.OrderEntity;
@@ -50,7 +49,7 @@ public class OrderEntityController {
         @ApiResponse(responseCode = "200", description = "Return created order, and http code status OK")
         @ApiResponse(responseCode = "400", description = "Error msg Bad request: Invalid ID")
         @ApiResponse(responseCode = "404", description = "Error msg: Not found")
-    public ResponseEntity<?> createOrder(@RequestBody OrderEntityDTO newOrder) throws NotValidArgumentException {
+    public ResponseEntity<?> createOrder(@RequestBody OrderEntityDTO newOrder) throws NotFoundException, NotValidArgumentException {
         validateEntries(newOrder);
         OrderEntity newOrderEntity = orderEntityService.createOrder(newOrder);
         return new ResponseEntity<>(newOrderEntity, HttpStatus.OK);

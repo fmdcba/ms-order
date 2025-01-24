@@ -2,15 +2,19 @@ package com.mindhub.ms_order.services.Impl;
 
 import com.mindhub.ms_order.dtos.OrderEntityDTO;
 import com.mindhub.ms_order.exceptions.NotFoundException;
+import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import com.mindhub.ms_order.mappers.OrderEntityMapper;
 import com.mindhub.ms_order.models.OrderEntity;
 import com.mindhub.ms_order.repositories.OrderEntityRepository;
 import com.mindhub.ms_order.services.OrderEntityService;
-import org.hibernate.annotations.NotFound;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderEntityServiceImpl implements OrderEntityService {
@@ -21,21 +25,24 @@ public class OrderEntityServiceImpl implements OrderEntityService {
     @Autowired
     OrderEntityMapper orderEntityMapper;
 
+    @Autowired
+    RestTemplate restTemplate;
+
     @Override
     public OrderEntityDTO getOrder(Long id) throws NotFoundException {
-        if(existsById(id)) {
+        try {
             return orderEntityMapper.orderToDTO(findById(id));
-        } else {
-            throw new NotFoundException("Not found.");
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
     }
 
     @Override
     public OrderEntity getOrderEntity(Long id) throws NotFoundException {
-        if(existsById(id)) {
+        try {
             return findById(id);
-        } else {
-            throw new NotFoundException("Not found.");
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
     }
 
@@ -45,32 +52,38 @@ public class OrderEntityServiceImpl implements OrderEntityService {
     }
 
     @Override
-    public OrderEntity createOrder(OrderEntityDTO newOrder) {
-        return save(orderEntityMapper.orderToEntity(newOrder));
+    public OrderEntity createOrder(OrderEntityDTO newOrder) throws NotFoundException {
+        try {
+            isValidUserId(newOrder.getUserId());
+            return save(orderEntityMapper.orderToEntity(newOrder));
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     @Override
     public OrderEntity updateOrder(Long id, OrderEntityDTO updatedOrder) throws NotFoundException {
-        if(existsById(id)) {
+        try {
             OrderEntity orderToUpdate = findById(id);
             return save(orderEntityMapper.updateOrderToEntity(orderToUpdate, updatedOrder));
-        } else {
-            throw new NotFoundException("Not found.");
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
     }
 
     @Override
     public void deleteOrder(Long id) throws NotFoundException {
-        if(existsById(id)) {
+        try {
+            existsById(id);
             deleteById(id);
-        } else {
-            throw new NotFoundException("Not found.");
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         }
     }
 
     @Override
     public OrderEntity findById(Long id) throws NotFoundException {
-        return (orderEntityRepository.findById(id).orElseThrow(() -> new NotFoundException("Not found.")));
+        return (orderEntityRepository.findById(id).orElseThrow(() -> new NotFoundException("Order not found.")));
     }
 
     @Override
@@ -89,7 +102,22 @@ public class OrderEntityServiceImpl implements OrderEntityService {
     }
 
     @Override
-    public Boolean existsById(Long id) {
-        return orderEntityRepository.existsById(id);
+    public void existsById(Long id) throws NotFoundException {
+        if (!orderEntityRepository.existsById(id)) {
+            throw new NotFoundException("Order not found.");
+        }
+    }
+
+    @Override
+    public void isValidUserId(Long id) throws NotFoundException {
+        String url = "http://localhost:8081/api/users/" + id;
+        try {
+            restTemplate.exchange(url, HttpMethod.GET, null, Map.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new NotFoundException("User with ID: " + id + " not found.");
+        }
     }
 }
+
+
+
