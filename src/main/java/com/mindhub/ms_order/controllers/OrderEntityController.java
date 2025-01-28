@@ -5,14 +5,17 @@ import com.mindhub.ms_order.exceptions.NotFoundException;
 import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import com.mindhub.ms_order.models.OrderEntity;
 import com.mindhub.ms_order.models.OrderStatus;
+import com.mindhub.ms_order.services.Impl.PDFGeneratorServiceImpl;
 import com.mindhub.ms_order.services.OrderEntityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -24,6 +27,9 @@ public class OrderEntityController {
 
     @Autowired
     private ControllerValidations controllerValidations;
+
+    @Autowired
+    PDFGeneratorServiceImpl pdfGeneratorService;
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Order by id", description = "Return order if ID is valid and exists in DB")
@@ -49,10 +55,25 @@ public class OrderEntityController {
         @ApiResponse(responseCode = "200", description = "Return created order, and http code status OK")
         @ApiResponse(responseCode = "400", description = "Error msg Bad request: Invalid ID")
         @ApiResponse(responseCode = "404", description = "Error msg: Not found")
-    public ResponseEntity<?> createOrder(@RequestBody OrderEntityDTO newOrder) throws NotFoundException, NotValidArgumentException {
+    public ResponseEntity<byte[]> createOrder(@RequestBody OrderEntityDTO newOrder) throws NotFoundException, NotValidArgumentException {
         validateEntries(newOrder);
-        OrderEntity newOrderEntity = orderEntityService.createOrder(newOrder);
-        return new ResponseEntity<>(newOrderEntity, HttpStatus.OK);
+
+        OrderEntity createdOrder = orderEntityService.createOrder(newOrder);
+
+        ByteArrayInputStream pdfStream = pdfGeneratorService.export(createdOrder);
+        byte[] pdfBytes = pdfStream.readAllBytes();
+
+        String date = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+        String filename = "order_" + createdOrder.getId() + "_" + date + ".pdf";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.builder("attachment").filename(filename).build());
+        headers.setContentLength(pdfBytes.length);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
     }
 
     @PutMapping("/{id}")
