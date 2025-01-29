@@ -1,5 +1,6 @@
 package com.mindhub.ms_order.services.Impl;
 
+import com.mindhub.ms_order.config.RabbitMQConfig;
 import com.mindhub.ms_order.dtos.OrderEntityDTO;
 import com.mindhub.ms_order.exceptions.NotFoundException;
 import com.mindhub.ms_order.exceptions.NotValidArgumentException;
@@ -7,6 +8,7 @@ import com.mindhub.ms_order.mappers.OrderEntityMapper;
 import com.mindhub.ms_order.models.OrderEntity;
 import com.mindhub.ms_order.repositories.OrderEntityRepository;
 import com.mindhub.ms_order.services.OrderEntityService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,9 @@ public class OrderEntityServiceImpl implements OrderEntityService {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public OrderEntityDTO getOrder(Long id) throws NotFoundException {
@@ -55,7 +60,18 @@ public class OrderEntityServiceImpl implements OrderEntityService {
     public OrderEntity createOrder(OrderEntityDTO newOrder) throws NotFoundException {
         try {
             isValidUserId(newOrder.getUserId());
-            return save(orderEntityMapper.orderToEntity(newOrder));
+            OrderEntity createdOrder = orderEntityMapper.orderToEntity(newOrder);
+            save(createdOrder);
+
+
+            OrderEntityDTO createdOrderDTO = orderEntityMapper.orderToDTO(createdOrder);
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.ORDER_EXCHANGE,
+                    RabbitMQConfig.ORDER_CREATED_ROUTING_KEY,
+                    createdOrderDTO
+            );
+
+            return createdOrder;
         } catch (NotFoundException e) {
             throw new NotFoundException(e.getMessage());
         }
