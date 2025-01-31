@@ -17,4 +17,9 @@ public class ExceptionHandlers {
     public ResponseEntity<String> handleNotFoundExceptionException(NotFoundException notFoundException) {
         return new ResponseEntity<>(notFoundException.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(NotAuthorizedException.class)
+    public ResponseEntity<String> handleNotAuthorizedException(NotAuthorizedException notAuthorizedException) {
+        return new ResponseEntity<>(notAuthorizedException.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 }
