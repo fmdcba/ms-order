@@ -11,6 +11,7 @@ import com.mindhub.ms_order.models.OrderItem;
 import com.mindhub.ms_order.repositories.OrderItemRepository;
 import com.mindhub.ms_order.services.OrderEntityService;
 import com.mindhub.ms_order.services.OrderItemService;
+import com.mindhub.ms_order.utils.ServiceValidations;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,9 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private ServiceValidations serviceValidations;
+
     @Override
     public OrderItemDTO getOrderItem(Long id) throws NotFoundException, NotAuthorizedException {
         try {
@@ -76,6 +80,18 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Transactional
     public OrderItemDTO createOrderItem(OrderItemDTO newOrderItem) throws NotFoundException, NotValidArgumentException {
         try {
+            if (!serviceValidations.isAdmin()) {
+                Long userId = serviceValidations.getUserId();
+                try {
+                    OrderEntity order = orderEntityService.findById(newOrderItem.getOrderId());
+                    if (!order.getUserId().equals(userId)) {
+                        throw new NotAuthorizedException("Can't assign order items to other users");
+                    }
+                } catch (Exception e) {
+                    throw new NotFoundException(e.getMessage());
+                }
+            }
+
             isValidProductId(newOrderItem.getProductId());
             isValidProductQuantity(newOrderItem.getProductId(), newOrderItem.getQuantity());
             OrderEntity orderEntity = orderEntityService.getOrderEntity(newOrderItem.getOrderId());

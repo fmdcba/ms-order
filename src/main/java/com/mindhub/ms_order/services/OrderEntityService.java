@@ -16,7 +16,7 @@ public interface OrderEntityService extends GenericService<OrderEntity> {
 
     List<OrderEntityDTO> getAllOrders() throws NotFoundException, NotAuthorizedException;
 
-    OrderEntityDTO createOrder(OrderEntityDTO newOrderEntity) throws NotFoundException;
+    OrderEntityDTO createOrder(OrderEntityDTO newOrderEntity) throws NotFoundException, NotValidArgumentException;
 
     OrderEntityDTO updateOrder(Long id, OrderEntityDTO updatedOrderEntity) throws NotFoundException, NotAuthorizedException;
 

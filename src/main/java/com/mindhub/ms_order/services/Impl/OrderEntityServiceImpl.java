@@ -5,10 +5,13 @@ import com.mindhub.ms_order.config.RabbitMQConfig;
 import com.mindhub.ms_order.dtos.OrderEntityDTO;
 import com.mindhub.ms_order.exceptions.NotAuthorizedException;
 import com.mindhub.ms_order.exceptions.NotFoundException;
+import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import com.mindhub.ms_order.mappers.OrderEntityMapper;
 import com.mindhub.ms_order.models.OrderEntity;
+import com.mindhub.ms_order.models.OrderStatus;
 import com.mindhub.ms_order.repositories.OrderEntityRepository;
 import com.mindhub.ms_order.services.OrderEntityService;
+import com.mindhub.ms_order.utils.ServiceValidations;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +47,9 @@ public class OrderEntityServiceImpl implements OrderEntityService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private ServiceValidations serviceValidations;
 
     @Override
     public OrderEntityDTO getOrder(Long id) throws NotFoundException, NotAuthorizedException {
@@ -82,10 +88,11 @@ public class OrderEntityServiceImpl implements OrderEntityService {
 
     @Override
     @Transactional
-    public OrderEntityDTO createOrder(OrderEntityDTO newOrder) throws NotFoundException {
+    public OrderEntityDTO createOrder(OrderEntityDTO newOrder) throws NotFoundException, NotValidArgumentException {
         try {
-            if (!isAdmin()) {
-                Long userId = getUserId();
+            if (!serviceValidations.isAdmin()) {
+                Long userId = serviceValidations.getUserId();
+                hasPendingOrder(userId);
                 newOrder.setUserId(userId);
             }
 
@@ -100,10 +107,10 @@ public class OrderEntityServiceImpl implements OrderEntityService {
             );
 
             return order;
-        } catch (NotFoundException e) {
+        } catch (NotFoundException | NotValidArgumentException e) {
             log.warn(e.getMessage());
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            throw new NotFoundException(e.getMessage());
+            throw e;
         }
     }
 
@@ -203,16 +210,12 @@ public class OrderEntityServiceImpl implements OrderEntityService {
         }
     }
 
-    private Long getUserId() {
-        String token = jwtUtils.getJwtToken();
-        return jwtUtils.extractId(token);
-    }
+    private void hasPendingOrder (Long id) throws NotValidArgumentException {
+        boolean hasPendingOrder = orderEntityRepository.existsByUserIdAndStatus(id, OrderStatus.PENDING);
 
-    private boolean isAdmin() {
-        String token = jwtUtils.getJwtToken();
-        String userRole = jwtUtils.extractRole(token);
-
-       return userRole.equals("ADMIN");
+        if (hasPendingOrder) {
+            throw new NotValidArgumentException("You already have a pending order. Please complete it before creating a new one.");
+        }
     }
 
     @Override
