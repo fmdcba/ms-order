@@ -1,17 +1,24 @@
 package com.mindhub.ms_order.services.Impl;
 
+import com.mindhub.ms_order.config.JwtUtils;
 import com.mindhub.ms_order.config.RabbitMQConfig;
 import com.mindhub.ms_order.dtos.OrderEntityDTO;
+import com.mindhub.ms_order.exceptions.NotAuthorizedException;
 import com.mindhub.ms_order.exceptions.NotFoundException;
-import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import com.mindhub.ms_order.mappers.OrderEntityMapper;
 import com.mindhub.ms_order.models.OrderEntity;
 import com.mindhub.ms_order.repositories.OrderEntityRepository;
 import com.mindhub.ms_order.services.OrderEntityService;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,24 +28,32 @@ import java.util.Map;
 @Service
 public class OrderEntityServiceImpl implements OrderEntityService {
 
-    @Autowired
-    OrderEntityRepository orderEntityRepository;
+    private static final Logger log = LoggerFactory.getLogger(OrderEntityServiceImpl.class);
 
     @Autowired
-    OrderEntityMapper orderEntityMapper;
+    private OrderEntityRepository orderEntityRepository;
 
     @Autowired
-    RestTemplate restTemplate;
+    private OrderEntityMapper orderEntityMapper;
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Override
-    public OrderEntityDTO getOrder(Long id) throws NotFoundException {
+    public OrderEntityDTO getOrder(Long id) throws NotFoundException, NotAuthorizedException {
         try {
-            return orderEntityMapper.orderToDTO(findById(id));
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
+            OrderEntityDTO order = orderEntityMapper.orderToDTO(findById(id));
+            validateAuthorization(order.getUserId());
+            return order;
+        } catch (NotFoundException | NotAuthorizedException e) {
+            log.warn(e.getMessage());
+            throw e;
         }
     }
 
@@ -47,53 +62,78 @@ public class OrderEntityServiceImpl implements OrderEntityService {
         try {
             return findById(id);
         } catch (NotFoundException e) {
+            log.warn(e.getMessage());
             throw new NotFoundException(e.getMessage());
         }
     }
 
     @Override
-    public List<OrderEntityDTO> getAllOrders() {
-        return  orderEntityMapper.orderListToDTO(orderEntityRepository.findAll());
+    public List<OrderEntityDTO> getAllOrders() throws NotFoundException, NotAuthorizedException {
+        try {
+            validateIsAdmin();
+            List<OrderEntityDTO> ordersList = orderEntityMapper.orderListToDTO(orderEntityRepository.findAll());
+            validateOrderListIsEmpty(ordersList);
+            return ordersList;
+        } catch (NotFoundException | NotAuthorizedException e) {
+            log.warn(e.getMessage());
+            throw e;
+        }
     }
 
     @Override
-    public OrderEntity createOrder(OrderEntityDTO newOrder) throws NotFoundException {
+    @Transactional
+    public OrderEntityDTO createOrder(OrderEntityDTO newOrder) throws NotFoundException {
         try {
+            if (!isAdmin()) {
+                Long userId = getUserId();
+                newOrder.setUserId(userId);
+            }
+
             isValidUserId(newOrder.getUserId());
-            OrderEntity createdOrder = orderEntityMapper.orderToEntity(newOrder);
-            save(createdOrder);
+            OrderEntity savedOrder = save(orderEntityMapper.orderToEntity(newOrder));
+            OrderEntityDTO order = orderEntityMapper.orderToDTO(savedOrder);
 
-
-            OrderEntityDTO createdOrderDTO = orderEntityMapper.orderToDTO(createdOrder);
-            rabbitTemplate.convertAndSend(
-                    RabbitMQConfig.ORDER_EXCHANGE,
+            amqpTemplate.convertAndSend(
+                    RabbitMQConfig.EXCHANGE_NAME,
                     RabbitMQConfig.ORDER_CREATED_ROUTING_KEY,
-                    createdOrderDTO
+                    order
             );
 
-            return createdOrder;
+            return order;
         } catch (NotFoundException e) {
+            log.warn(e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new NotFoundException(e.getMessage());
         }
     }
 
     @Override
-    public OrderEntity updateOrder(Long id, OrderEntityDTO updatedOrder) throws NotFoundException {
+    @Transactional
+    public OrderEntityDTO updateOrder(Long id, OrderEntityDTO updatedOrder) throws NotFoundException, NotAuthorizedException {
         try {
+            validateAuthorization(updatedOrder.getUserId());
+            isValidUserId(updatedOrder.getUserId());
             OrderEntity orderToUpdate = findById(id);
-            return save(orderEntityMapper.updateOrderToEntity(orderToUpdate, updatedOrder));
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
+            OrderEntity savedOrder = save(orderEntityMapper.updateOrderToEntity(orderToUpdate, updatedOrder));
+            return orderEntityMapper.orderToDTO(savedOrder);
+        } catch (NotFoundException | NotAuthorizedException e) {
+            log.warn(e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw e;
         }
     }
 
     @Override
-    public void deleteOrder(Long id) throws NotFoundException {
+    @Transactional
+    public void deleteOrder(Long id) throws NotFoundException, NotAuthorizedException {
         try {
+            validateAuthorization(findById(id).getUserId());
             existsById(id);
             deleteById(id);
-        } catch (NotFoundException e) {
-            throw new NotFoundException(e.getMessage());
+        } catch (NotFoundException | NotAuthorizedException e) {
+            log.warn(e.getMessage());
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw e;
         }
     }
 
@@ -124,13 +164,64 @@ public class OrderEntityServiceImpl implements OrderEntityService {
         }
     }
 
-    @Override
-    public void isValidUserId(Long id) throws NotFoundException {
-        String url = "http://localhost:8081/api/users/" + id;
+    private void validateOrderListIsEmpty(List<OrderEntityDTO> allOrders) throws NotFoundException {
+        if (allOrders.toArray().length == 0) {
+            throw new NotFoundException("No orders found to show.");
+        }
+    }
+
+    private void isValidUserId(Long id) throws NotFoundException {
+        String url = "http://localhost:8080/api/users/" + id;
         try {
-            restTemplate.exchange(url, HttpMethod.GET, null, Map.class);
+            HttpEntity<String> entity = createAuthHttpEntity(null);
+            restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
         } catch (HttpClientErrorException.NotFound e) {
             throw new NotFoundException("User with ID: " + id + " not found.");
+        }
+    }
+
+    @Override
+    public <T> HttpEntity<T> createAuthHttpEntity(T body){
+        String token = jwtUtils.getJwtToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        if (body != null) {
+            return new HttpEntity<>(body, headers);
+        } else {
+            return new HttpEntity<>(headers);
+        }
+    }
+
+    private void validateAuthorization(Long id) throws NotAuthorizedException {
+        String token = jwtUtils.getJwtToken();
+        Long userId = jwtUtils.extractId(token);
+
+        if (!userId.equals(id)) {
+            validateIsAdmin();
+        }
+    }
+
+    private Long getUserId() {
+        String token = jwtUtils.getJwtToken();
+        return jwtUtils.extractId(token);
+    }
+
+    private boolean isAdmin() {
+        String token = jwtUtils.getJwtToken();
+        String userRole = jwtUtils.extractRole(token);
+
+       return userRole.equals("ADMIN");
+    }
+
+    @Override
+    public void validateIsAdmin() throws NotAuthorizedException {
+        String token = jwtUtils.getJwtToken();
+        String userRole = jwtUtils.extractRole(token);
+
+        if (!userRole.equals("ADMIN")) {
+            throw new NotAuthorizedException("You are not authorized to access this resource.");
         }
     }
 }
