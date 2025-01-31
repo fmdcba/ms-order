@@ -33,6 +33,10 @@ public class OrderEntityDTO {
         return userId;
     }
 
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     public List<OrderItemDTO> getProducts() {
         return products;
     }
