@@ -1,4 +1,4 @@
-package com.mindhub.ms_order.controllers;
+package com.mindhub.ms_order.utils;
 
 import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import org.springframework.stereotype.Component;
