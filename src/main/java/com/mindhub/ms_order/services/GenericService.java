@@ -2,6 +2,7 @@ package com.mindhub.ms_order.services;
 
 import com.mindhub.ms_order.exceptions.NotAuthorizedException;
 import com.mindhub.ms_order.exceptions.NotFoundException;
+import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import org.springframework.http.HttpEntity;
 
 import java.util.List;

@@ -166,7 +166,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         }
     }
 
-    private void isValidProductId(Long id) throws NotFoundException {
+    public void isValidProductId(Long id) throws NotFoundException {
         String url = "http://localhost:8080/api/products/" + id;
         try {
             HttpEntity<String> entity = createAuthHttpEntity(null);
@@ -177,7 +177,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
 
-    private void isValidProductQuantity(Long id, Integer productQuantity) throws NotValidArgumentException {
+    public void isValidProductQuantity(Long id, Integer productQuantity) throws NotValidArgumentException {
         String url = "http://localhost:8080/api/products/" + id;
         HttpEntity<String> entity = createAuthHttpEntity(null);
 

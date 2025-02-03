@@ -29,7 +29,7 @@ public class MsOrderApplication {
 
 			OrderItem orderItem = new OrderItem(order, 2L, 7);
 			OrderItem orderItem1 = new OrderItem(order, 3L, 6);
-			OrderItem orderItem2 = new OrderItem(order1, 4L, 12);
+			OrderItem orderItem2 = new OrderItem(order1, 2L, 12);
 
 			orderItemRepository.save(orderItem);
 			orderItemRepository.save(orderItem1);

@@ -3,13 +3,17 @@ package com.mindhub.ms_order.services.Impl;
 import com.mindhub.ms_order.config.JwtUtils;
 import com.mindhub.ms_order.config.RabbitMQConfig;
 import com.mindhub.ms_order.dtos.OrderEntityDTO;
+import com.mindhub.ms_order.dtos.OrderItemDTO;
 import com.mindhub.ms_order.exceptions.NotAuthorizedException;
 import com.mindhub.ms_order.exceptions.NotFoundException;
 import com.mindhub.ms_order.exceptions.NotValidArgumentException;
 import com.mindhub.ms_order.mappers.OrderEntityMapper;
+import com.mindhub.ms_order.mappers.OrderItemMapper;
 import com.mindhub.ms_order.models.OrderEntity;
+import com.mindhub.ms_order.models.OrderItem;
 import com.mindhub.ms_order.models.OrderStatus;
 import com.mindhub.ms_order.repositories.OrderEntityRepository;
+import com.mindhub.ms_order.repositories.OrderItemRepository;
 import com.mindhub.ms_order.services.OrderEntityService;
 import com.mindhub.ms_order.utils.ServiceValidations;
 import jakarta.transaction.Transactional;
@@ -20,11 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +44,13 @@ public class OrderEntityServiceImpl implements OrderEntityService {
     private OrderEntityRepository orderEntityRepository;
 
     @Autowired
+    private OrderItemRepository orderItemRepository;
+
+    @Autowired
     private OrderEntityMapper orderEntityMapper;
+
+    @Autowired
+    private OrderItemMapper orderItemMapper;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -98,13 +111,14 @@ public class OrderEntityServiceImpl implements OrderEntityService {
 
             isValidUserId(newOrder.getUserId());
             OrderEntity savedOrder = save(orderEntityMapper.orderToEntity(newOrder));
+            validateOrderItems(newOrder.getProducts(), savedOrder);
             OrderEntityDTO order = orderEntityMapper.orderToDTO(savedOrder);
 
-            amqpTemplate.convertAndSend(
-                    RabbitMQConfig.EXCHANGE_NAME,
-                    RabbitMQConfig.ORDER_CREATED_ROUTING_KEY,
-                    order
-            );
+//            amqpTemplate.convertAndSend(
+//                    RabbitMQConfig.EXCHANGE_NAME,
+//                    RabbitMQConfig.ORDER_CREATED_ROUTING_KEY,
+//                    order
+//            );
 
             return order;
         } catch (NotFoundException | NotValidArgumentException e) {
@@ -187,8 +201,31 @@ public class OrderEntityServiceImpl implements OrderEntityService {
         }
     }
 
+    private void validateOrderItems(List<OrderItemDTO> itemList, OrderEntity order) throws NotValidArgumentException, NotFoundException {
+        for (int i = 0; i < itemList.size(); i++) {
+            OrderItemDTO item = itemList.get(i);
+            Long productId = item.getProductId();
+            Integer quantity = item.getQuantity();
+
+            ResponseEntity<?> orderItemIdResponse = serviceValidations.isValidProductId(productId);
+            boolean existsItem = orderItemIdResponse.getStatusCode().is2xxSuccessful();
+            if (existsItem) {
+                Map<String, Object> bodyMap = (Map<String, Object>) orderItemIdResponse.getBody();
+
+                Integer availableStock = Integer.parseInt(bodyMap.get("stock").toString());
+
+                if (availableStock > quantity) {
+                    OrderItem orderItem = new OrderItem(order, productId, quantity);
+                    orderItemRepository.save(orderItem);
+                    serviceValidations.updateProductStock(productId, availableStock, quantity);
+                }
+            }
+        }
+    }
+
+
     @Override
-    public <T> HttpEntity<T> createAuthHttpEntity(T body){
+    public <T> HttpEntity<T> createAuthHttpEntity(T body) {
         String token = jwtUtils.getJwtToken();
 
         HttpHeaders headers = new HttpHeaders();
@@ -210,7 +247,7 @@ public class OrderEntityServiceImpl implements OrderEntityService {
         }
     }
 
-    private void hasPendingOrder (Long id) throws NotValidArgumentException {
+    private void hasPendingOrder(Long id) throws NotValidArgumentException {
         boolean hasPendingOrder = orderEntityRepository.existsByUserIdAndStatus(id, OrderStatus.PENDING);
 
         if (hasPendingOrder) {
