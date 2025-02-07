@@ -18,14 +18,20 @@
 								{
 									"name": "Get Non-Existent Order",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "localhost:8083/api/orders/:id",
+											"raw": "localhost:8080/api/orders/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"orders",
@@ -44,14 +50,20 @@
 								{
 									"name": "Get Order With Invalid ID",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "localhost:8083/api/orders/:id",
+											"raw": "localhost:8080/api/orders/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"orders",
@@ -70,6 +82,12 @@
 								{
 									"name": "Create Order With Invalid User ID",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "POST",
 										"header": [],
 										"body": {
@@ -81,13 +99,19 @@
 												}
 											}
 										},
-										"url": "localhost:8083/api/orders"
+										"url": "localhost:8080/api/orders"
 									},
 									"response": []
 								},
 								{
 									"name": "Create Order With Non-Existent User ID",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "POST",
 										"header": [],
 										"body": {
@@ -99,13 +123,19 @@
 												}
 											}
 										},
-										"url": "localhost:8083/api/orders"
+										"url": "localhost:8080/api/orders"
 									},
 									"response": []
 								},
 								{
 									"name": "Update Non-Existent Order",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "PUT",
 										"header": [],
 										"body": {
@@ -118,11 +148,11 @@
 											}
 										},
 										"url": {
-											"raw": "localhost:8083/api/orders/:id",
+											"raw": "localhost:8080/api/orders/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"orders",
@@ -141,6 +171,12 @@
 								{
 									"name": "Update With Null User ID",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "PUT",
 										"header": [],
 										"body": {
@@ -153,11 +189,11 @@
 											}
 										},
 										"url": {
-											"raw": "localhost:8083/api/orders/:id",
+											"raw": "localhost:8080/api/orders/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"orders",
@@ -176,14 +212,20 @@
 								{
 									"name": "Delete Non-Existent Order",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "localhost:8083/api/orders/:id",
+											"raw": "localhost:8080/api/orders/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"orders",
@@ -204,14 +246,20 @@
 						{
 							"name": "Get Order",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8083/api/orders/:id",
+									"raw": "localhost:8080/api/orders/:id",
 									"host": [
 										"localhost"
 									],
-									"port": "8083",
+									"port": "8080",
 									"path": [
 										"api",
 										"orders",
@@ -230,33 +278,51 @@
 						{
 							"name": "Get All Orders",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "GET",
 								"header": [],
-								"url": "localhost:8083/api/orders"
+								"url": "localhost:8080/api/orders"
 							},
 							"response": []
 						},
 						{
 							"name": "Create Order",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"userId\": 1,\r\n    \"products\": [],\r\n    \"status\": \"PENDING\"\r\n}",
+									"raw": "{\r\n    \"userId\": 1,\r\n    \"products\": [\r\n        {\r\n    \"productId\": 1,\r\n    \"quantity\": 5\r\n        },\r\n        {\r\n    \"productId\": 2,\r\n    \"quantity\": 5\r\n        }\r\n    ],\r\n    \"status\": \"PENDING\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
 										}
 									}
 								},
-								"url": "localhost:8083/api/orders"
+								"url": "localhost:8080/api/orders"
 							},
 							"response": []
 						},
 						{
 							"name": "Update Order",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "PUT",
 								"header": [],
 								"body": {
@@ -269,11 +335,11 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8083/api/orders/:id",
+									"raw": "localhost:8080/api/orders/:id",
 									"host": [
 										"localhost"
 									],
-									"port": "8083",
+									"port": "8080",
 									"path": [
 										"api",
 										"orders",
@@ -292,14 +358,20 @@
 						{
 							"name": "Delete Order",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "localhost:8083/api/orders/:id",
+									"raw": "localhost:8080/api/orders/:id",
 									"host": [
 										"localhost"
 									],
-									"port": "8083",
+									"port": "8080",
 									"path": [
 										"api",
 										"orders",
@@ -308,7 +380,7 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "1"
+											"value": "3"
 										}
 									]
 								}
@@ -326,14 +398,20 @@
 								{
 									"name": "Get Non-Existent Order Item",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "localhost:8083/api/order-items/:id",
+											"raw": "localhost:8080/api/order-items/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"order-items",
@@ -352,14 +430,20 @@
 								{
 									"name": "Get Order Item With Invalid ID",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "localhost:8083/api/order-items/:id",
+											"raw": "localhost:8080/api/order-items/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"order-items",
@@ -378,6 +462,12 @@
 								{
 									"name": "Create Order Item With No Quantity",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "POST",
 										"header": [],
 										"body": {
@@ -389,13 +479,19 @@
 												}
 											}
 										},
-										"url": "localhost:8083/api/order-items"
+										"url": "localhost:8080/api/order-items"
 									},
 									"response": []
 								},
 								{
 									"name": "Create Order Item With Insufficient Stock",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "POST",
 										"header": [],
 										"body": {
@@ -407,13 +503,19 @@
 												}
 											}
 										},
-										"url": "localhost:8083/api/order-items"
+										"url": "localhost:8080/api/order-items"
 									},
 									"response": []
 								},
 								{
 									"name": "Create Order Item With Invalid Order ID",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "POST",
 										"header": [],
 										"body": {
@@ -425,13 +527,19 @@
 												}
 											}
 										},
-										"url": "localhost:8083/api/order-items"
+										"url": "localhost:8080/api/order-items"
 									},
 									"response": []
 								},
 								{
 									"name": "Create Order Item With Invalid Product ID",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "POST",
 										"header": [],
 										"body": {
@@ -443,13 +551,19 @@
 												}
 											}
 										},
-										"url": "localhost:8083/api/order-items"
+										"url": "localhost:8080/api/order-items"
 									},
 									"response": []
 								},
 								{
 									"name": "Update Non-Existent Order Item",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "PUT",
 										"header": [],
 										"body": {
@@ -462,11 +576,11 @@
 											}
 										},
 										"url": {
-											"raw": "localhost:8083/api/order-items/:id",
+											"raw": "localhost:8080/api/order-items/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"order-items",
@@ -485,6 +599,12 @@
 								{
 									"name": "Update With Null Product ID",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "PUT",
 										"header": [],
 										"body": {
@@ -497,11 +617,11 @@
 											}
 										},
 										"url": {
-											"raw": "localhost:8083/api/orders/:id",
+											"raw": "localhost:8080/api/orders/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"orders",
@@ -520,14 +640,20 @@
 								{
 									"name": "Delete Non-Existent Order Item",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": {
+												"token": "{{JWT}}"
+											}
+										},
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "localhost:8083/api/order-items/:id",
+											"raw": "localhost:8080/api/order-items/:id",
 											"host": [
 												"localhost"
 											],
-											"port": "8083",
+											"port": "8080",
 											"path": [
 												"api",
 												"order-items",
@@ -548,14 +674,20 @@
 						{
 							"name": "Get Order Item",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8083/api/order-items/:id",
+									"raw": "localhost:8080/api/order-items/:id",
 									"host": [
 										"localhost"
 									],
-									"port": "8083",
+									"port": "8080",
 									"path": [
 										"api",
 										"order-items",
@@ -564,7 +696,7 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "1"
+											"value": "99"
 										}
 									]
 								}
@@ -574,15 +706,27 @@
 						{
 							"name": "Get All Order Items",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "GET",
 								"header": [],
-								"url": "localhost:8083/api/order-items"
+								"url": "localhost:8080/api/order-items"
 							},
 							"response": []
 						},
 						{
 							"name": "Create Order Item (With Enough Stock)",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
@@ -594,13 +738,19 @@
 										}
 									}
 								},
-								"url": "localhost:8083/api/order-items"
+								"url": "localhost:8080/api/order-items"
 							},
 							"response": []
 						},
 						{
 							"name": "Update Order Item",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "PUT",
 								"header": [],
 								"body": {
@@ -613,11 +763,11 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8083/api/order-items/:id",
+									"raw": "localhost:8080/api/order-items/:id",
 									"host": [
 										"localhost"
 									],
-									"port": "8083",
+									"port": "8080",
 									"path": [
 										"api",
 										"order-items",
@@ -636,14 +786,20 @@
 						{
 							"name": "Delete Order Item",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{JWT}}"
+									}
+								},
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "localhost:8083/api/order-items/:id",
+									"raw": "localhost:8080/api/order-items/:id",
 									"host": [
 										"localhost"
 									],
-									"port": "8083",
+									"port": "8080",
 									"path": [
 										"api",
 										"order-items",

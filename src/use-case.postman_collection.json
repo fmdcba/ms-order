@@ -7,88 +7,46 @@
 	},
 	"item": [
 		{
-			"name": "Get all Users",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": "localhost:8081/api/users"
-			},
-			"response": []
-		},
-		{
-			"name": "Create User",
+			"name": "Register User",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\": \"fulano\", \"email\": \"fulano@full.com\", \"roles\": \"USER\"}",
+					"raw": "{\"username\": \"newuser\", \"email\": \"daniaranda.003@gmail.com\", \"password\": \"newuser123\"}",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "localhost:8081/api/users"
+				"url": "localhost:8080/api/auth/register"
 			},
 			"response": []
 		},
 		{
-			"name": "Get All Products",
+			"name": "Validate User",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [],
-				"url": "localhost:8082/api/products"
-			},
-			"response": []
-		},
-		{
-			"name": "Create Product",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"name\": \"Arandela\", \"description\": \"Redonda 8mm\", \"price\": 10.5, \"stock\": 50}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": "localhost:8082/api/products"
-			},
-			"response": []
-		},
-		{
-			"name": "Patch Product",
-			"request": {
-				"method": "PATCH",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"stock\": 45}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "localhost:8082/api/products/:id",
+					"raw": "localhost:8080/api/auth/validate?token=",
 					"host": [
 						"localhost"
 					],
-					"port": "8082",
+					"port": "8080",
 					"path": [
 						"api",
-						"products",
-						":id"
+						"auth",
+						"validate"
 					],
-					"variable": [
+					"query": [
 						{
-							"key": "id",
-							"value": "1"
+							"key": "token",
+							"value": ""
 						}
 					]
 				}
@@ -96,44 +54,170 @@
 			"response": []
 		},
 		{
-			"name": "Get All Orders",
+			"name": "Login User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"JWT\", pm.response.text())"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
-				"method": "GET",
-				"header": [],
-				"url": "localhost:8083/api/orders"
-			},
-			"response": []
-		},
-		{
-			"name": "Create Order",
-			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{JWT}}"
+					}
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userId\": 1,\r\n    \"products\": [],\r\n    \"status\": \"PENDING\"\r\n}",
+					"raw": "{\r\n    \"email\" : \"daniaranda.003@gmail.com\",\r\n    \"password\" : \"newuser123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "localhost:8083/api/orders"
+				"url": "localhost:8080/api/auth/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Login Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"JWT\", pm.response.text())"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{JWT}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"pepe@admin.com\",\r\n    \"password\" : \"pass\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:8080/api/auth/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Get all Users",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{JWT}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/api/users"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Products",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{JWT}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/api/products"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Orders",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{JWT}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/api/orders"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{JWT}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": 3,\r\n    \"products\": [],\r\n    \"status\": \"PENDING\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:8080/api/orders"
 			},
 			"response": []
 		},
 		{
 			"name": "Get All Order Items",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{JWT}}"
+					}
+				},
 				"method": "GET",
 				"header": [],
-				"url": "localhost:8083/api/order-items"
+				"url": "localhost:8080/api/order-items"
 			},
 			"response": []
 		},
 		{
 			"name": "Create Order Item With Insufficient Stock",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{JWT}}"
+					}
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -145,13 +229,19 @@
 						}
 					}
 				},
-				"url": "localhost:8083/api/order-items"
+				"url": "localhost:8080/api/order-items"
 			},
 			"response": []
 		},
 		{
 			"name": "Create Order Item (With Enough Stock)",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{JWT}}"
+					}
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -163,7 +253,7 @@
 						}
 					}
 				},
-				"url": "localhost:8083/api/order-items"
+				"url": "localhost:8080/api/order-items"
 			},
 			"response": []
 		}
